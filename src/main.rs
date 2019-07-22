@@ -9,6 +9,7 @@ struct Query;
 #[juniper::object(Context = Context)]
 impl Query {
     fn users(executor: &Executor) -> Vec<User> {
+        // This doesn't cause a panic
         executor.look_ahead();
 
         vec![User {
@@ -24,6 +25,7 @@ struct User {
 #[juniper::object(Context = Context)]
 impl User {
     fn country(&self, executor: &Executor) -> &Country {
+        // This panics!
         executor.look_ahead();
 
         &self.country
