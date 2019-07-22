@@ -1,12 +1,8 @@
 use juniper::*;
 
-struct Context;
-
-impl juniper::Context for Context {}
-
 struct Query;
 
-#[juniper::object(Context = Context)]
+#[juniper::object]
 impl Query {
     fn users(executor: &Executor) -> Vec<User> {
         // This doesn't cause a panic
@@ -22,7 +18,7 @@ struct User {
     country: Country,
 }
 
-#[juniper::object(Context = Context)]
+#[juniper::object]
 impl User {
     fn country(&self, executor: &Executor) -> &Country {
         // This panics!
@@ -36,18 +32,16 @@ struct Country {
     id: i32,
 }
 
-#[juniper::object(Context = Context)]
+#[juniper::object]
 impl Country {
     fn id(&self) -> i32 {
         self.id
     }
 }
 
-type Schema = juniper::RootNode<'static, Query, EmptyMutation<Context>>;
+type Schema = juniper::RootNode<'static, Query, EmptyMutation<()>>;
 
 fn main() {
-    let ctx = Context {};
-
     let _ = juniper::execute(
         r#"
             query Query {
@@ -65,7 +59,7 @@ fn main() {
         None,
         &Schema::new(Query, EmptyMutation::new()),
         &Variables::new(),
-        &ctx,
+        &(),
     )
     .unwrap();
 
